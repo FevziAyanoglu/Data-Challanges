@@ -135,9 +135,10 @@ class FlappyBirdGame {
         // Durumlar: 'START', 'PLAYING', 'GAMEOVER'
         this.state = 'START';
 
-        // Oyun Değişkenleri
-        this.gravity = 0.38;
-        this.jumpForce = -7.2;
+        // Oyun Değişkenleri (Dengeli Fizik Değerleri)
+        this.gravity = 0.28;        // Yumuşak ve dengeli yerçekimi ivmesi
+        this.jumpForce = -6.2;      // Doğal ve kontrollü zıplama kuvveti
+        this.maxFallSpeed = 7.8;    // Terminal düşüş hızı (kontrolsüz hızlanmayı engeller)
         this.score = 0;
         this.bestScore = parseInt(localStorage.getItem('flappy_best_score') || '0', 10);
 
@@ -184,6 +185,8 @@ class FlappyBirdGame {
 
         this.initEventListeners();
         this.lastTime = performance.now();
+        this.accumulator = 0;
+        this.fixedStep = 1000 / 60; // 60 FPS sabit fizik güncelleme adımı
         requestAnimationFrame((t) => this.loop(t));
     }
 
@@ -272,6 +275,7 @@ class FlappyBirdGame {
 
     jump() {
         this.bird.velocity = this.jumpForce;
+        this.bird.rotation = -0.42; // Zıplama anında yukarı bakış açısı
         this.sound.playJump();
         
         // Zıplama puf parçacıkları
@@ -369,10 +373,23 @@ class FlappyBirdGame {
     }
 
     // --- Güncelleme & Çizim Döngüsü ---
-    loop() {
-        this.update();
+    loop(timestamp) {
+        if (!timestamp) timestamp = performance.now();
+        let dt = timestamp - this.lastTime;
+        this.lastTime = timestamp;
+
+        // Sekme arka planda kaldığında veya ani takılmalarda 'spiral of death' engelleme
+        if (dt > 100) dt = 100;
+        this.accumulator += dt;
+
+        // Sabit 60 FPS adımlarıyla fizik simülasyonu
+        while (this.accumulator >= this.fixedStep) {
+            this.update();
+            this.accumulator -= this.fixedStep;
+        }
+
         this.draw();
-        requestAnimationFrame(() => this.loop());
+        requestAnimationFrame((t) => this.loop(t));
     }
 
     update() {
@@ -410,15 +427,20 @@ class FlappyBirdGame {
             return;
         }
 
-        // Kuş fiziği
+        // Kuş fiziği ve dengeli ivmelenme
         this.bird.velocity += this.gravity;
+        if (this.bird.velocity > this.maxFallSpeed) {
+            this.bird.velocity = this.maxFallSpeed;
+        }
         this.bird.y += this.bird.velocity;
 
-        // Dönüş açısı yumuşatma
+        // Dönüş açısı yumuşatma (Doğal süzülme ve dalış eğrisi)
         if (this.bird.velocity < 0) {
-            this.bird.rotation = Math.max(-0.45, this.bird.velocity * 0.08);
+            const targetRotation = Math.max(-0.45, this.bird.velocity * 0.07);
+            this.bird.rotation += (targetRotation - this.bird.rotation) * 0.2;
         } else {
-            this.bird.rotation = Math.min(1.2, (this.bird.velocity - 2) * 0.12);
+            const targetRotation = Math.min(1.2, (this.bird.velocity / this.maxFallSpeed) * 1.25);
+            this.bird.rotation += (targetRotation - this.bird.rotation) * 0.16;
         }
 
         // Zemin hareketi
