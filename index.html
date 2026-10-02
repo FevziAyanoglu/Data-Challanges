@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Flappy Bird Modern</title>
+    <meta name="description" content="Modern, akıcı animasyonlara ve ses efektlerine sahip Flappy Bird oyunu.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-wrapper">
+        <!-- Oyun Alanı (Canvas) -->
+        <canvas id="gameCanvas" width="400" height="600"></canvas>
+
+        <!-- Canlı Skor Göstergesi -->
+        <div id="liveScore" class="hud-score">0</div>
+
+        <!-- Ses Aç/Kapat Butonu -->
+        <button id="soundBtn" class="hud-btn" aria-label="Sesi Aç/Kapat" title="Sesi Aç/Kapat">
+            <span id="soundIcon">🔊</span>
+        </button>
+
+        <!-- Başlangıç Ekranı -->
+        <div id="startScreen" class="overlay-screen active">
+            <div class="glass-card start-card">
+                <div class="badge">KLASİK ARCADE</div>
+                <h1 class="game-title">FLAPPY<br><span class="highlight">BIRD</span></h1>
+                
+                <div class="character-preview">
+                    <div class="bird-bounce">
+                        <svg class="preview-bird-svg" viewBox="0 0 60 45" width="70" height="52">
+                            <!-- Gövde -->
+                            <ellipse cx="28" cy="24" rx="20" ry="16" fill="#FACC15" />
+                            <!-- Karın -->
+                            <ellipse cx="24" cy="28" rx="14" ry="10" fill="#FEF08A" />
+                            <!-- Göz -->
+                            <circle cx="36" cy="17" r="7" fill="#FFFFFF" />
+                            <circle cx="38" cy="17" r="3.5" fill="#0F172A" />
+                            <circle cx="39" cy="15" r="1.5" fill="#FFFFFF" />
+                            <!-- Gaga -->
+                            <path d="M 44 20 L 56 24 L 44 30 Z" fill="#F97316" stroke="#C2410C" stroke-width="1.5" />
+                            <!-- Kanat -->
+                            <ellipse cx="16" cy="24" rx="10" ry="7" fill="#EAB308" transform="rotate(-10 16 24)" />
+                        </svg>
+                    </div>
+                </div>
+
+                <p class="controls-hint">
+                    Uçmak için <strong>BOŞLUK</strong>, <strong>YUKARI OK</strong> veya ekrana <strong>DOKUN</strong>
+                </p>
+
+                <button id="startBtn" class="btn-play">
+                    <span>OYUNA BAŞLA</span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Oyun Bitti Ekranı -->
+        <div id="gameOverScreen" class="overlay-screen hidden">
+            <div class="glass-card game-over-card">
+                <div class="skull-badge">💥</div>
+                <h2 class="game-over-title">OYUN BİTTİ</h2>
+
+                <div class="stats-box">
+                    <div class="stat-item">
+                        <span class="stat-label">SKOR</span>
+                        <span id="finalScore" class="stat-value">0</span>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item">
+                        <span class="stat-label">EN YÜKSEK</span>
+                        <span id="bestScore" class="stat-value">0</span>
+                    </div>
+                </div>
+
+                <div id="newBestBadge" class="new-best-badge hidden">🎉 YENİ REKOR! 🎉</div>
+
+                <div id="medalContainer" class="medal-wrapper hidden">
+                    <span class="medal-label">Kazanılan Madalya</span>
+                    <div id="medalIcon" class="medal-icon">🥉</div>
+                    <div id="medalName" class="medal-name">Bronz</div>
+                </div>
+
+                <button id="restartBtn" class="btn-play btn-restart">
+                    <span>TEKRAR DENE</span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
